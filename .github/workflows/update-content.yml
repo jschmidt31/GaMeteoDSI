@@ -1,0 +1,25 @@
+name: Update Content
+
+on:
+  push:
+    paths:
+      - 'content.json'
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update HTML content
+        run: |
+          # Récupérer le contenu du fichier JSON
+          content=$(cat content.json)
+          
+          # Mettre à jour le contenu HTML avec les nouvelles données
+          sed -i "s/contenteditable>.*<\/td>/contenteditable>$content<\/td>/g" index.html
+          
+          # Commiter et pousser les changements
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git commit -am "Update content"
+          git push
