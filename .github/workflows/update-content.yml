@@ -26,9 +26,10 @@ jobs:
           # Vérifier si des modifications ont été apportées
           if [[ -n $(git status --porcelain) ]]; then
             # Commiter et pousser les changements
+            git add index.html
             git config user.name 'GitHub Actions'
             git config user.email 'actions@github.com'
-            git commit -am "Update content"
+            git commit -m "Update content"
             git push
           else
             echo "Aucune modification à commiter."
