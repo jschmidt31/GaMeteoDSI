@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Récupérer tout l'historique du dépôt
       - name: Update HTML content
         run: |
           # Récupérer le contenu du fichier JSON
@@ -21,8 +23,13 @@ jobs:
             sed -i "$((i+2))s|<td contenteditable>.*</td>|<td contenteditable>${lines[$i]}</td>|" index.html
           done
           
-          # Commiter et pousser les changements
-          git config user.name 'GitHub Actions'
-          git config user.email 'actions@github.com'
-          git commit -am "Update content"
-          git push
+          # Vérifier si des modifications ont été apportées
+          if [[ -n $(git status --porcelain) ]]; then
+            # Commiter et pousser les changements
+            git config user.name 'GitHub Actions'
+            git config user.email 'actions@github.com'
+            git commit -am "Update content"
+            git push
+          else
+            echo "Aucune modification à commiter."
+          fi
