@@ -10,7 +10,87 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:name: Update Content
+
+on:
+  push:
+    paths:
+      - 'content.json'
+
+jobs:
+  update-content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
         with:
+          fetch-depth: 0 # Récupérer tout l'historique du dépôt
+      - name: Update HTML content
+        run: |
+          # Récupérer le contenu du fichier JSON
+          content=$(cat content.json)
+          
+          # Créer un nouveau fichier index.html avec les nouvelles données
+          cat << EOF > index.html
+          <!DOCTYPE html>
+          <html lang="fr">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>État des services IT</title>
+              <style>
+                  table {
+                      width: 100%;
+                      border-collapse: collapse;
+                  }
+                  th, td {
+                      padding: 10px;
+                      text-align: left;
+                      border-bottom: 1px solid #ddd;
+                  }
+                  .status-icon {
+                      font-size: 24px;
+                      text-align: center;
+                  }
+                  .status-icon.sun {
+                      color: gold;
+                  }
+                  .status-icon.cloud-light {
+                      color: lightgray;
+                  }
+                  .status-icon.cloud-dark {
+                      color: gray;
+                  }
+              </style>
+          </head>
+          <body>
+              <h1>État des services IT</h1>
+              <table>
+                  <tr>
+                      <th>Service</th>
+                      <th>Statut</th>
+                      <th>Commentaire</th>
+                  </tr>
+                  $(
+                  IFS=$'\n' read -ra lines <<< "$content"
+                  for i in "${!lines[@]}"; do
+                      echo "                  <tr>"
+                      echo "                      <td>Service $((i+1))</td>"
+                      echo "                      <td class=\"status-icon sun\">&#9728;</td>"
+                      echo "                      <td contenteditable>${lines[$i]}</td>"
+                      echo "                  </tr>"
+                  done
+                  )
+              </table>
+          </body>
+          </html>
+          EOF
+          
+          # Commiter et pousser les changements
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git add index.html
+          git commit -m "Update content" || echo "Aucune modification à commiter."
+          git push || echo "Impossible de pousser les changements."
           fetch-depth: 0 # Récupérer tout l'historique du dépôt
       - name: Update HTML content
         run: |
