@@ -25,6 +25,10 @@ jobs:
           
           # Vérifier si des modifications ont été apportées
           if [[ -n $(git status --porcelain) ]]; then
+            # Attendre 20 secondes pour laisser le temps au workflow "pages-build-deployment" de se terminer
+            echo "Attente de 20 secondes avant de commiter et pousser les changements..."
+            sleep 20
+            
             # Commiter et pousser les changements
             git config user.name 'GitHub Actions'
             git config user.email 'actions@github.com'
