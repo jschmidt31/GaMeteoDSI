@@ -16,11 +16,10 @@ jobs:
           content=$(cat content.json)
           
           # Mettre à jour le contenu HTML avec les nouvelles données
-          i=1
-          while IFS= read -r line; do
-            sed -i "${i}s|<td contenteditable>.*</td>|<td contenteditable>$line</td>|" index.html
-            i=$((i+1))
-          done <<< "$content"
+          IFS=$'\n' read -ra lines <<< "$content"
+          for i in "${!lines[@]}"; do
+            sed -i "$((i+2))s|<td contenteditable>.*</td>|<td contenteditable>${lines[$i]}</td>|" index.html
+          done
           
           # Commiter et pousser les changements
           git config user.name 'GitHub Actions'
