@@ -23,17 +23,9 @@ jobs:
             sed -i "$((i+2))s|<td contenteditable>.*</td>|<td contenteditable>${lines[$i]}</td>|" index.html
           done
           
-          # Vérifier si des modifications ont été apportées
-          if [[ -n $(git status --porcelain) ]]; then
-            # Attendre 20 secondes pour laisser le temps au workflow "pages-build-deployment" de se terminer
-            echo "Attente de 20 secondes avant de commiter et pousser les changements..."
-            sleep 20
-            
-            # Commiter et pousser les changements
-            git config user.name 'GitHub Actions'
-            git config user.email 'actions@github.com'
-            git commit -am "Update content"
-            git push
-          else
-            echo "Aucune modification à commiter."
-          fi
+          # Commiter et pousser les changements
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git add index.html
+          git commit -m "Update content" || echo "Aucune modification à commiter."
+          git push || echo "Impossible de pousser les changements."
