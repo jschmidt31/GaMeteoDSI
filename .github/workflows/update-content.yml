@@ -6,8 +6,13 @@ on:
       - 'content.json'
 
 jobs:
+
   update-content:
     runs-on: ubuntu-latest
+    
+    # Attendre la fin du workflow "pages-build-deployment"
+    needs: github-pages
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -34,3 +39,14 @@ jobs:
           else
             echo "Aucune modification à commiter."
           fi
+
+  # Workflow "pages-build-deployment"
+  github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/deploy-pages@v1
